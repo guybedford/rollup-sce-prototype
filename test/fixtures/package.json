@@ -1,0 +1,7 @@
+{
+  "name": "custom-package",
+  "version": "some",
+  "dependencies": {
+    "thing": "*"
+  }
+}

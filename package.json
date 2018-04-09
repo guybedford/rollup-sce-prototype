@@ -1,0 +1,23 @@
+{
+  "name": "rollup-plugin-sce",
+  "version": "0.1.0",
+  "description": "Standard compiler extensions Rollup plugin",
+  "main": "rollup-sce.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "mocha -u tdd test --timeout 20000 -b"
+  },
+  "dependencies": {
+    "js-yaml": "^3.11.0",
+    "rollup-pluginutils": "^2.0.1",
+    "tosource": "^1.0.0",
+    "tslib": "^1.9.0",
+    "typescript": "^2.8.1",
+    "worker-farm": "^1.6.0"
+  },
+  "devDependencies": {
+    "mocha": "^4.0.1",
+    "rollup": "^0.57.1",
+    "rollup-plugin-node-resolve": "^3.3.0"
+  }
+}
