@@ -1,3 +1,4 @@
-export async function a () {
-  await new Promise((resolve, reject) => resolve(1000));
+export function a (str) {
+  const a = 5;
+  return a;
 }

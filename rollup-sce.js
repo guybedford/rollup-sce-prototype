@@ -2,26 +2,17 @@ const path = require('path');
 const { createFilter } = require('rollup-pluginutils');
 const workerFarm = require('worker-farm');
 
-// TODO: .css (+modules), .less, .sass, .vue, .glsl
-const compilerList = Object.create(null);
-for (let ext of ['.js', '.jsx', '.json', '.ts', '.tsx', '.yaml'])
-  compilerList[ext] = true;
-
 module.exports = (options = {}) => {
-  const babel = options.babel;
+  const babel = options.babel || options.envTarget;
   const envTarget = options.envTarget;
-  const filter = createFilter(options.include, options.exclude);
+
+  // TODO: .css (+modules), .less, .sass, .vue, .glsl, .pug, .handlebars
+  const filter = createFilter(options.include || '**.(js|jsx|json|toml|ts|tsx|yaml)', options.exclude);
 
   let transformWorker;
 
-  const tslibPath = require.resolve('tslib/tslib.es6.js');
-
   return {
     name: 'rollup-sce',
-    resolveId (id, parent) {
-      if (id === 'tslib' && (parent.endsWith('.ts') || parent.endsWith('.tsx')) && filter(id))
-        return tslibPath;
-    },
     transform (source, id) {
       transformWorker = transformWorker || workerFarm({
         maxConcurrentWorkers: require('os').cpus().length / 2,
@@ -33,12 +24,15 @@ module.exports = (options = {}) => {
         return;
       
       const ext = path.extname(id);
-
-      if (ext in compilerList === false)
+      if (!ext)
         return;
 
       if (!babel && ext === '.js')
         return;
+
+      // TODO: maintain an internal cache?
+      // requires knowledge of external dependencies
+      // ideally Rollup can do this internally!
 
       return new Promise((resolve, reject) => {
         transformWorker.transform(source, id, options, (err, result) => err ? reject(err) : resolve(result));

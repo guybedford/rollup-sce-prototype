@@ -1,39 +1,43 @@
-const fs = require('fs');
-const stage3 = ['asyncGenerators', 'classProperties', 'optionalCatchBinding', 'objectRestSpread', 'numericSeparator'];
-const stage3DynamicImport = stage3.concat(['dynamicImport', 'importMeta']);
-const babel = require('@babel/core');
+const { transform: babelTransform } = require('@babel/core');
+const { getConfig } = require('../utils');
+const externalHelpers = require('@babel/plugin-external-helpers');
+const stage3Syntax = ['asyncGenerators', 'classProperties', 'optionalCatchBinding', 'objectRestSpread', 'numericSeparator', 'dynamicImport', 'importMeta'];
 
 let babelPresetEnv;
 
-class babel {
+const helpersPath = require.resolve('../babel-helpers.js').replace(/\\/g, '/');
+
+module.exports = class babel {
   constructor (options, sourceMap, envTarget) {
     if (envTarget && !babelPresetEnv)
       babelPresetEnv = require('@babel/preset-env');
     this.options = options;
     this.sourceMap = sourceMap;
-    // lookup .babelrc here
+    this.envTarget = envTarget;
   }
 
-  async transform (source, id, callback) {
+  getBabelOptions (id) {
+    const options = getConfig(id, '.babelrc', this.options);
+    options.babelrc = false;
+    options.ast = false;
+    options.filename = id;
+    options.sourceType = 'module';
+    options.parserOpts = { plugins: stage3Syntax };
+    options.plugins = [externalHelpers, ...options.plugins || []];
+    options.presets = this.envTarget ? [[babelPresetEnv, {
+      modules: false,
+      targets: this.envTarget
+    }], ...options.presets || []] : options.presets;
+    return options;
+  }
+
+  async transform (source, id) {
     try {
-      return babel.transform(source, {
-        babelrc: false,
-        parserOpts: {
-          plugins: stage3DynamicImport
-        },
-        ast: false,
-        filename: id,
-        parserOpts: {
-          allowReturnOutsideFunction: true,
-          plugins: stage3
-        },
-        sourceType: 'module',
-        presets: envTarget && [[babelPresetEnv, {
-          modules: false,
-          // this assignment pending release of https://github.com/babel/babel/pull/7438
-          targets: Object.assign({}, envTarget)
-        }]]
-      });
+      let { code, map } = babelTransform(source, this.getBabelOptions(id));
+      // no newline to avoid sourcemap complications
+      if (code.indexOf('babelHelpers.') !== -1)
+        code = `import * as babelHelpers from "${helpersPath}";${code}`;
+      return { code, map };
     }
     catch (err) {
       if (err.pos || err.loc)

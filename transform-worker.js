@@ -10,7 +10,7 @@ function getCompiler (ext, options) {
   if (compilerConstructor.data)
     compilerInstance = new compilerConstructor(options.dataNamedExports, options.sourceMap === true);
   else
-    compilerInstance = new compilerConstructor(options[compilerConstructor.name], options.sourceMap === true, options.envTarget);
+    compilerInstance = new compilerConstructor(options[compilerConstructor.name + 'Options'], options.sourceMap === true, options.envTarget);
   compilerInstances[ext] = compilerInstance;
   return compilerInstance;
 }

@@ -2,9 +2,11 @@
 
 Standard compiler extensions for Rollup.
 
-Provides Rollup compilation of `.ts`, `.tsx` (based on `tsconfig.json`), `.jsx`, `.json` and `.yaml` files.
+Provides Rollup compilation of `.css`, `.ts`, `.tsx` (based on `tsconfig.json`), `.jsx`, `.json`, `.toml` and `.yaml` files.
 
 Babel compilation for `.js` files can be enabled optionally as well (following `.babelrc` config) with the `babel: true` configuration.
+
+Compilations are pooled over worker threads for performance.
 
 ## Installation
 
@@ -26,27 +28,39 @@ import rollupSce from 'rollup-plugin-sce';
 export default {
   input: './main.ts',
   plugins: [
+    resolve({ extensions: ['.ts', '.json'] }),
+    commonjs(),
     rollupSce({
-      // optional include / exclude rules
+      // optional global include / exclude rules
       include: ['./src/*.ts'],
+      exclude: ['node_modules/**'],
 
       // whether to create a source map
       // sourceMap: true,
 
+      // whether to apply Babel to ".js" sources
       // babel: true,
+
+      // whether to use css modules
+      // cssmodules: true,
+
+      // custom compiler options objects
+      // babelOptions: { plugins: ['custom-plugin'] }
+      // typescriptOptions
+      // postcssOptions
       
-      // when importing data formats (json / yaml / csv), whether to provide named exports
+      // when importing data formats (json / yaml / toml), whether to provide named exports
       // dataNamedExports: true,
 
-      // applies to Babel
+      // applies to Babel, PostCSS and TypeScript conversions
+      // enables babel compilation when set
       envTarget: {
         browsers: 'last 2 versions'
       }
-    }),
-    resolve({ extensions: ['.ts', '.json'] }),
-    commonjs()
+    })
   ]
 }
 ```
 
-> Note it is important to put this plugin **first** to ensure correct precedence behaviours.
+If different custom configurations are needed for different paths,
+instantiating multiple versions of the plugin is supported and will share the same worker pool.

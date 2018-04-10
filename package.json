@@ -5,17 +5,26 @@
   "main": "rollup-sce.js",
   "license": "MIT",
   "scripts": {
+    "build": "node build-babel-helpers.js",
     "test": "mocha -u tdd test --timeout 20000 -b"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0-beta.44",
+    "@babel/plugin-external-helpers": "^7.0.0-beta.44",
+    "@babel/preset-env": "^7.0.0-beta.44",
+    "@babel/preset-react": "^7.0.0-beta.44",
     "js-yaml": "^3.11.0",
+    "json5": "^1.0.1",
     "rollup-pluginutils": "^2.0.1",
+    "toml": "^2.3.3",
     "tosource": "^1.0.0",
     "tslib": "^1.9.0",
     "typescript": "^2.8.1",
     "worker-farm": "^1.6.0"
   },
   "devDependencies": {
+    "@babel/helpers": "^7.0.0-beta.44",
+    "@babel/plugin-transform-async-to-generator": "^7.0.0-beta.44",
     "mocha": "^4.0.1",
     "rollup": "^0.57.1",
     "rollup-plugin-node-resolve": "^3.3.0"

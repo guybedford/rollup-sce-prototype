@@ -1,6 +1,9 @@
+const json5 = require('json5');
+
 // config file lookup utility
 const fileCache = {};
 exports.getConfig = function (filePath, configName, defaultConfig) {
+  // json5.parse
   // recursive configuration lookup process
   return Object.assign({}, defaultConfig);
 };
