@@ -191,8 +191,30 @@ suite('typescript', () => {
     assert.ok(code.indexOf('__values') !== -1);
   });
 
-  test.skip('tsconfig', async () => {
-    
+  test('tsconfig.json', async () => {
+    const bundle = await rollup.rollup({
+      input: path.resolve(basePath, 'tsconfig/tscustom.ts'),
+      plugins: [resolve({
+        extensions: ['.ts']
+      }), autocompile()]
+    });
+  
+    const { code, map } = await bundle.generate({ format: 'cjs' });
+    assert.ok(code.indexOf('__values') !== -1);
+  });
+
+  test('configFiles false', async () => {
+    const bundle = await rollup.rollup({
+      input: path.resolve(basePath, 'tsconfig/tscustom.ts'),
+      plugins: [resolve({
+        extensions: ['.ts']
+      }), autocompile({
+        configFiles: false
+      })]
+    });
+  
+    const { code, map } = await bundle.generate({ format: 'cjs' });
+    assert.ok(code.indexOf('__values') === -1);
   });
 });
 
@@ -218,17 +240,42 @@ suite('babel', () => {
     assert.equal(val, 5);
   });
 
-  test.skip('babelrc', async () => {
+  test('babelrc', async () => {
+    const bundle = await rollup.rollup({
+      input: path.resolve(basePath, 'babelrc/babelhelper.js'),
+      plugins: [autocompile({
+        babel: true
+      })]
+    });
+  
+    const { code, map } = await bundle.generate({ format: 'cjs' });
+    assert.ok(code.indexOf('asyncToGenerator') !== -1);
+    const exports = {};
+    eval(code);
+    const val = await exports.p([new Promise(resolve => resolve())]);
+    assert.equal(val, 5);
+  });
 
+  test('configFiles false', async () => {
+    const bundle = await rollup.rollup({
+      input: path.resolve(basePath, 'babelrc/babelhelper.js'),
+      plugins: [autocompile({
+        babel: true,
+        configFiles: false
+      })]
+    });
+  
+    const { code, map } = await bundle.generate({ format: 'cjs' });
+    assert.ok(code.indexOf('asyncToGenerator') === -1);
+    const exports = {};
+    eval(code);
+    const val = await exports.p([new Promise(resolve => resolve())]);
+    assert.equal(val, 5);
   });
 });
 
 suite('syntax errors', () => {
   
-});
-
-suite('target env', () => {
-
 });
 
 suite('sourcemaps', () => {

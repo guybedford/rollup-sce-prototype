@@ -8,6 +8,7 @@ function getCompiler (ext) {
   if (compilerInstance)
     return compilerInstance;
   
+  // (-> @rollup/autocompile-[ext])
   const compilerConstructor = require('./compilers/' + ext.substr(1) + '.js');
   compilerInstance = new compilerConstructor(compilerOptions);
   compilerInstances[ext] = compilerInstance;

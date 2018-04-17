@@ -30,11 +30,14 @@ module.exports = class babel {
       parserOpts: { plugins: stage3Syntax },
       plugins: [externalHelpers]
     });
+    this.checkConfigFile = options.configFiles !== false;
     this.configCache = Object.create(null);
     this.sourceMap = options.sourceMap === true;
   }
 
   async getConfig (file) {
+    if (this.checkConfigFile === false)
+      return this.babelOptions;
     let dir = path.dirname(file);
     while (true) {
       let configPromise = this.configCache[dir];

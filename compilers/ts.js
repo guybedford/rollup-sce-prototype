@@ -15,6 +15,7 @@ function extendConfig (config, newConfig) {
     else
       config[p] = val;
   }
+  return config;
 }
 
 module.exports = class typescript {
@@ -27,18 +28,21 @@ module.exports = class typescript {
       importHelpers: true,
       sourceMap: this.sourceMap
     });
+    this.checkConfigFile = options.configFiles !== false;
     this.configCache = Object.create(null);
     this.sourceMap = options.sourceMap;
   }
 
   async getConfig (file) {
+    if (this.checkConfigFile === false)
+      return this.compilerOptions;
     let dir = path.dirname(file);
     while (true) {
       let configPromise = this.configCache[dir];
       if (!configPromise) {
         configPromise = this.configCache[dir] = new Promise((resolve, reject) => {
           fs.readFile(`${dir}/tsconfig.json`, (err, source) => {
-            if (err !== undefined || err.code !== 'ENOENT') 
+            if (!err || err.code === 'ENOENT')
               resolve(source && source.toString());
             else
               reject(err);
@@ -49,7 +53,7 @@ module.exports = class typescript {
         .then(source => {
           if (!source)
             return undefined;
-          return extendConfig(JSON.parse(source), this.compilerOptions);
+          return extendConfig(JSON.parse(source).compilerOptions || {}, this.compilerOptions);
         });
       }
       // NB should we skip configurations that don't apply through their files, include and exclude?
