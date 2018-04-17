@@ -1,5 +1,5 @@
 const toml = require('toml');
-const { dataToNamedExports } = require('../utils');
+const { dataToNamedExports } = require('rollup-pluginutils');
 const toSource = require('tosource');
 
 module.exports = class {
@@ -15,5 +15,3 @@ module.exports = class {
     return dataToNamedExports(parsed);
   }
 };
-
-module.exports.data = true;

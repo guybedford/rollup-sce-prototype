@@ -1,5 +1,5 @@
 const rollup = require('rollup');
-const rollupSce = require('../rollup-sce');
+const autocompile = require('../rollup-autocompile');
 const path = require('path');
 const assert = require('assert');
 const resolve = require('rollup-plugin-node-resolve');
@@ -10,7 +10,7 @@ suite('Basic Usage', () => {
   test('typescript', async () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'typescript.ts'),
-      plugins: [rollupSce(), resolve({
+      plugins: [autocompile(), resolve({
         extensions: ['.ts']
       })]
     });
@@ -24,15 +24,15 @@ suite('Basic Usage', () => {
   test('json', async () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'package.json'),
-      plugins: [rollupSce(), resolve({
+      plugins: [autocompile(), resolve({
         extensions: ['.json']
       })]
     });
   
     const { code, map } = await bundle.generate({ format: 'cjs' });
-    const module = { exports: undefined };
+    const exports = {}
     eval(code);
-    assert.equal(module.exports.name, 'custom-package');
+    assert.equal(exports.name, 'custom-package');
   });
 
   test('json named', async () => {
@@ -40,7 +40,7 @@ suite('Basic Usage', () => {
       input: path.resolve(basePath, 'package.json'),
       plugins: [resolve({
         extensions: ['.json']
-      }), rollupSce({
+      }), autocompile({
         dataNamedExports: true
       })]
     });
@@ -56,13 +56,13 @@ suite('Basic Usage', () => {
       input: path.resolve(basePath, 'toml.toml'),
       plugins: [resolve({
         extensions: ['.toml']
-      }), rollupSce()]
+      }), autocompile()]
     });
   
     const { code, map } = await bundle.generate({ format: 'cjs' });
-    const module = { exports: undefined };
+    const exports = {};
     eval(code);
-    assert.equal(module.exports.some.config, 'value');
+    assert.equal(exports.some.config, 'value');
   });
 
   test('yaml', async () => {
@@ -70,13 +70,13 @@ suite('Basic Usage', () => {
       input: path.resolve(basePath, 'yaml.yaml'),
       plugins: [resolve({
         extensions: ['.yaml']
-      }), rollupSce()]
+      }), autocompile()]
     });
   
     const { code, map } = await bundle.generate({ format: 'cjs' });
-    const module = { exports: undefined };
+    const expoorts = {};
     eval(code);
-    assert.equal(module.exports.some, 'config');
+    assert.equal(exports.some, 'config');
   });
 
   test('tsx', async () => {
@@ -84,7 +84,7 @@ suite('Basic Usage', () => {
       input: path.resolve(basePath, 'typescript.tsx'),
       plugins: [resolve({
         extensions: ['.tsx']
-      }), rollupSce()]
+      }), autocompile()]
     });
   
     const { code, map } = await bundle.generate({ format: 'cjs' });
@@ -106,16 +106,11 @@ suite('Basic Usage', () => {
   test('babel', async () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'babel.js'),
-      plugins: [rollupSce({
-        envTarget: {
-          'ie': 11
-        }
-      })]
+      plugins: [autocompile()]
     });
   
     const { code, map } = await bundle.generate({ format: 'cjs' });
     const exports = {};
-    assert.ok(code.indexOf('const') === -1);
     eval(code);
     assert.equal(exports.a(), 5);
   });
@@ -123,7 +118,7 @@ suite('Basic Usage', () => {
   test('jsx', async () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'babel.jsx'),
-      plugins: [rollupSce()]
+      plugins: [autocompile()]
     });
   
     const { code, map } = await bundle.generate({ format: 'cjs' });
@@ -145,7 +140,7 @@ suite('Basic Usage', () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'dynamic-import.js'),
       experimentalDynamicImport: true,
-      plugins: [rollupSce()]
+      plugins: [autocompile()]
     });
   
     let logValue;
@@ -167,7 +162,7 @@ suite('typescript', () => {
   test('helpers', async () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'tshelper.ts'),
-      plugins: [rollupSce(), resolve({
+      plugins: [autocompile(), resolve({
         extensions: ['.ts']
       })]
     });
@@ -183,9 +178,11 @@ suite('typescript', () => {
       input: path.resolve(basePath, 'tscustom.ts'),
       plugins: [resolve({
         extensions: ['.ts']
-      }), rollupSce({
-        typescriptOptions: {
-          downlevelIteration: true
+      }), autocompile({
+        config: {
+          typescript: {
+            downlevelIteration: true
+          }
         }
       })]
     });
@@ -203,10 +200,12 @@ suite('babel', () => {
   test('helpers and inline config', async () => {
     const bundle = await rollup.rollup({
       input: path.resolve(basePath, 'babelhelper.js'),
-      plugins: [rollupSce({
+      plugins: [autocompile({
         babel: true,
-        babelOptions: {
-          plugins: ['@babel/transform-async-to-generator']
+        config: {
+          babel: {
+            plugins: ['@babel/transform-async-to-generator']
+          }
         }
       })]
     });

@@ -1,7 +1,7 @@
 {
-  "name": "rollup-plugin-sce",
+  "name": "@rollup/autocompile",
   "version": "0.1.0",
-  "description": "Standard compiler extensions Rollup plugin",
+  "description": "Autocompilation plugin for Rollup",
   "main": "rollup-sce.js",
   "license": "MIT",
   "scripts": {

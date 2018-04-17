@@ -1,8 +1,8 @@
-# rollup-plugin-sce
+# @rollup/autocompile
 
-Standard compiler extensions for Rollup.
+Provides automatic compilatioin of standard compiler extensions for Rollup.
 
-Provides Rollup compilation of `.css`, `.ts`, `.tsx` (based on `tsconfig.json`), `.jsx`, `.json`, `.toml` and `.yaml` files.
+Includes support for `.css`, `.ts`, `.tsx` (based on `tsconfig.json`), `.jsx`, `.json`, `.toml` and `.yaml` files.
 
 Babel compilation for `.js` files can be enabled optionally as well (following `.babelrc` config) with the `babel: true` configuration.
 
@@ -11,7 +11,7 @@ Compilations are pooled over worker threads for performance.
 ## Installation
 
 ```bash
-npm install --save-dev rollup-plugin-sce
+npm install --save-dev @rollup/autocompile
 ```
 
 ## Usage
@@ -23,14 +23,14 @@ Example Rollup configuration with other plugins:
 import path from 'path';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
-import rollupSce from 'rollup-plugin-sce';
+import autocompile from '@rollup/autocompile';
 
 export default {
   input: './main.ts',
   plugins: [
     resolve({ extensions: ['.ts', '.json'] }),
     commonjs(),
-    rollupSce({
+    autocompile({
       // optional global include / exclude rules
       include: ['./src/*.ts'],
       exclude: ['node_modules/**'],
@@ -42,21 +42,21 @@ export default {
       // babel: true,
 
       // whether to use css modules
-      // cssmodules: true,
+      // cssModules: true,
 
-      // custom compiler options objects
-      // babelOptions: { plugins: ['custom-plugin'] }
-      // typescriptOptions
-      // postcssOptions
+      // whether to autoinstall needed compilers
+      // autoInstall: false,
+
+      // whether to load configuration files
+      // configFiles: true,
+
+      // custom configuration overrides for compilers
+      // config: {
+      //  [compilerName]: options
+      // },
       
       // when importing data formats (json / yaml / toml), whether to provide named exports
-      // dataNamedExports: true,
-
-      // applies to Babel, PostCSS and TypeScript conversions
-      // enables babel compilation when set
-      envTarget: {
-        browsers: 'last 2 versions'
-      }
+      // dataNamedExports: true
     })
   ]
 }

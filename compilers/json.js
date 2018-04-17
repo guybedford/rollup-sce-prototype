@@ -1,8 +1,8 @@
-const { dataToNamedExports } = require('../utils');
+const { dataToNamedExports } = require('rollup-pluginutils');
 
 module.exports = class {
-  constructor (dataNamedExports) {
-    this.dataNamedExports = dataNamedExports;
+  constructor (options) {
+    this.dataNamedExports = options.dataNamedExports;
   }
 
   async transform (source, id) {
@@ -13,5 +13,3 @@ module.exports = class {
     return dataToNamedExports(parsed);
   }
 };
-
-module.exports.data = true;

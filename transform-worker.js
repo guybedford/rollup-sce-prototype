@@ -1,22 +1,21 @@
 const path = require('path');
-const compilerInstances = Object.create(null);
 
-function getCompiler (ext, options) {
+const compilerInstances = Object.create(null);
+const compilerOptions = JSON.parse(process.env.AUTOCOMPILE_OPTIONS);
+
+function getCompiler (ext) {
   let compilerInstance = compilerInstances[ext];
   if (compilerInstance)
     return compilerInstance;
   
   const compilerConstructor = require('./compilers/' + ext.substr(1) + '.js');
-  if (compilerConstructor.data)
-    compilerInstance = new compilerConstructor(options.dataNamedExports, options.sourceMap === true);
-  else
-    compilerInstance = new compilerConstructor(options[compilerConstructor.name + 'Options'], options.sourceMap === true, options.envTarget);
+  compilerInstance = new compilerConstructor(compilerOptions);
   compilerInstances[ext] = compilerInstance;
   return compilerInstance;
 }
 
-exports.transform = function (source, id, options, callback) {
+exports.transform = function (source, id, callback) {
   Promise.resolve()
-  .then(() => getCompiler(path.extname(id), options).transform(source, id))
+  .then(() => getCompiler(path.extname(id)).transform(source, id))
   .then(result => callback(null, result), callback);
 };

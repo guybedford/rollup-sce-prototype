@@ -1,4 +1,4 @@
-const { dataToNamedExports } = require('../utils');
+const { dataToNamedExports } = require('rollup-pluginutils');
 const YAML = require('js-yaml');
 const toSource = require('tosource');
 
@@ -15,5 +15,3 @@ module.exports = class {
     return dataToNamedExports(parsed);
   }
 };
-
-module.exports.data = true;
